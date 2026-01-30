@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
 import viteReact from '@vitejs/plugin-react'
-import ssg from '@hono/vite-ssg'
 
 import tailwindcss from '@tailwindcss/vite'
 
@@ -18,7 +17,6 @@ export default defineConfig({
     }),
     viteReact(),
     tailwindcss(),
-    ssg()
   ],
   server: {
     proxy: {
