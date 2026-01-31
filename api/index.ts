@@ -1,15 +1,19 @@
-import { handle } from 'hono/vercel'
 import app from '../server/src/index'
 
-// Mount the Hono app at /api so routes like app.get('/') become /api and app.get('/foo') become /api/foo
-const apiApp = app.basePath('/api')
-
-export const runtime = 'edge'
-
-export const GET = handle(apiApp)
-export const POST = handle(apiApp)
-export const PUT = handle(apiApp)
-export const PATCH = handle(apiApp)
-export const DELETE = handle(apiApp)
-export const OPTIONS = handle(apiApp)
-export const HEAD = handle(apiApp)
+/**
+ * Vercel serverless handler for Hono.
+ * Rewrites /api/* to /* so the Hono app sees the same paths as in local dev (proxy strips /api).
+ */
+export default {
+  fetch(request: Request) {
+    const url = new URL(request.url)
+    const pathname = url.pathname.replace(/^\/api/, '') || '/'
+    const newUrl = new URL(pathname + url.search, url.origin)
+    const rewritten = new Request(newUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+    })
+    return app.fetch(rewritten)
+  },
+}
